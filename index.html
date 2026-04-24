@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NFC Streak</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; text-align: center; }
+        .table-container { display: flex; justify-content: center; gap: 10px; margin-top: 50px; }
+        .day-card { border: 2px solid #333; padding: 15px; border-radius: 8px; width: 80px; }
+        .checked { background: #00ff88; color: #000; border-color: #00ff88; font-weight: bold; }
+        h1 { color: #00ff88; }
+    </style>
+</head>
+<body>
+
+    <h1>🔥 WEEKLY STREAK</h1>
+    <div class="table-container" id="streakTable">
+        </div>
+
+    <script>
+        // 1. DATA: The days of the week
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        
+        // 2. GET CURRENT DAY: 0 = Sunday, 1 = Monday, etc.
+        const todayIndex = new Date().getDay();
+
+        // 3. STORAGE: Check if we have saved progress in the phone's memory
+        // 'localStorage' is a simple "key = value" list.
+        let savedData = JSON.parse(localStorage.getItem('nfc_streak')) || [false, false, false, false, false, false, false];
+
+        // 4. THE AUTO-CHECK: Mark today as "True" (Checked In) immediately
+        savedData[todayIndex] = true;
+        localStorage.setItem('nfc_streak', JSON.stringify(savedData));
+
+        // 5. THE VISUALS: This part draws the table on the screen
+        const table = document.getElementById('streakTable');
+        days.forEach((day, index) => {
+            let statusClass = savedData[index] ? 'day-card checked' : 'day-card';
+            let checkMark = savedData[index] ? '✔' : '';
+            table.innerHTML += `<div class="${statusClass}">${day}<br>${checkMark}</div>`;
+        });
+    </script>
+
+</body>
+</html>
