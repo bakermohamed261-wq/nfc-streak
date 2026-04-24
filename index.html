@@ -17,27 +17,36 @@
         </div>
 
     <script>
-        // 1. DATA: The days of the week
-        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        
-        // 2. GET CURRENT DAY: 0 = Sunday, 1 = Monday, etc.
-        const todayIndex = new Date().getDay();
+       // 1. Get the current day (0-6) and the date of the year (e.g., 115)
+const now = new Date();
+const todayIndex = now.getDay();
+const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
 
-        // 3. STORAGE: Check if we have saved progress in the phone's memory
-        // 'localStorage' is a simple "key = value" list.
-        let savedData = JSON.parse(localStorage.getItem('nfc_streak')) || [false, false, false, false, false, false, false];
+// 2. Load the saved data
+let savedData = JSON.parse(localStorage.getItem('nfc_streak')) || [false, false, false, false, false, false, false];
+let lastCheckInDay = localStorage.getItem('last_check_day') || 0;
 
-        // 4. THE AUTO-CHECK: Mark today as "True" (Checked In) immediately
-        savedData[todayIndex] = true;
-        localStorage.setItem('nfc_streak', JSON.stringify(savedData));
+// 3. THE RESET LOGIC: 
+// If it's been more than 7 days since your last tap, OR if we've circled back to a Sunday
+// we clear the board for a fresh start.
+if (dayOfYear - lastCheckInDay >= 7 || (todayIndex === 0 && lastCheckInDay != dayOfYear)) {
+    savedData = [false, false, false, false, false, false, false];
+}
 
-        // 5. THE VISUALS: This part draws the table on the screen
-        const table = document.getElementById('streakTable');
-        days.forEach((day, index) => {
-            let statusClass = savedData[index] ? 'day-card checked' : 'day-card';
-            let checkMark = savedData[index] ? '✔' : '';
-            table.innerHTML += `<div class="${statusClass}">${day}<br>${checkMark}</div>`;
-        });
+// 4. Mark today as checked and save the "Day of the Year"
+savedData[todayIndex] = true;
+localStorage.setItem('nfc_streak', JSON.stringify(savedData));
+localStorage.setItem('last_check_day', dayOfYear);
+
+// 5. Draw the table (This part stays the same)
+const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const table = document.getElementById('streakTable');
+table.innerHTML = ""; // Clear the old table
+days.forEach((day, index) => {
+    let statusClass = savedData[index] ? 'day-card checked' : 'day-card';
+    let checkMark = savedData[index] ? '✔' : '';
+    table.innerHTML += `<div class="${statusClass}">${day}<br>${checkMark}</div>`;
+});
     </script>
 
 </body>
